@@ -1,12 +1,61 @@
 [
   {
+    "id": "bk_1760786515413",
+    "serviceId": "svc-01",
+    "serviceTitle": "ถอดPVC และต่อเล็บ",
+    "date": "2025-10-18",
+    "time": "19:00",
+    "createdAt": "2025-10-18T11:21:55.413Z",
+    "status": "CONFIRMED",
+    "paymentMethod": "CASH",
+    "paidAt": "2025-10-18T11:22:18.707Z",
+    "customerName": "สมศรี",
+    "phone": "0812345678"
+  },
+  {
+    "id": "bk_1760785670005",
+    "serviceId": "svc-01",
+    "serviceTitle": "ถอดPVC และต่อเล็บ",
+    "date": "2025-10-18",
+    "time": "19:00",
+    "createdAt": "2025-10-18T11:07:50.005Z",
+    "status": "CANCELLED",
+    "promo": {
+      "title": "ถอด PVC + ต่อเล็บ + ทาสีเจล",
+      "price": 890,
+      "oldPrice": 1090
+    },
+    "paymentMethod": "CASH",
+    "paidAt": "2025-10-18T11:08:04.970Z",
+    "customerName": "1",
+    "phone": "0887456321"
+  },
+  {
+    "id": "bk_1760785619631",
+    "serviceId": "svc-03",
+    "serviceTitle": "ทาสีเจล",
+    "date": "2025-10-18",
+    "time": "19:00",
+    "createdAt": "2025-10-18T11:06:59.631Z",
+    "status": "CANCELLED",
+    "promo": {
+      "title": "ทาสีเจล + ล้างทำความสะอาด",
+      "price": 459,
+      "oldPrice": 590
+    },
+    "paymentMethod": "CASH",
+    "paidAt": "2025-10-18T11:07:24.738Z",
+    "customerName": "บลาๆ",
+    "phone": "0812345678"
+  },
+  {
     "id": "bk_1760784450098",
     "serviceId": "svc-03",
     "serviceTitle": "ทาสีเจล",
     "date": "2025-10-18",
     "time": "19:00",
     "createdAt": "2025-10-18T10:47:30.098Z",
-    "status": "PENDING"
+    "status": "CANCELLED"
   },
   {
     "id": "bk_1760784430678",
