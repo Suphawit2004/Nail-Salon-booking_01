@@ -25,7 +25,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "ไม่สามารถจองย้อนหลังได้" }, { status: 400 });
     }
 
-    // อ่านรายการปัจจุบันมาก่อน แล้วค่อยตรวจชนกัน
+    // Read list first, then check for conflicts
     const list = await readBookings();
     if (list.some(b => b.date === date && b.time === time && b.status !== "CANCELLED")) {
       return NextResponse.json({ error: "ช่วงเวลานี้ถูกจองแล้ว" }, { status: 409 });
