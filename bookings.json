@@ -1,1 +1,41 @@
-[]
+[
+  {
+    "id": "bk_1760808643539",
+    "serviceId": "svc-01",
+    "serviceTitle": "ถอดPVC และต่อเล็บ",
+    "date": "2025-10-19",
+    "time": "16:00",
+    "createdAt": "2025-10-18T17:30:43.539Z",
+    "status": "CONFIRMED",
+    "customerName": "ดด",
+    "phone": "0812345678",
+    "paymentMethod": "BANK",
+    "paidAt": "2025-10-18T17:31:13.821Z"
+  },
+  {
+    "id": "bk_1760803885520",
+    "serviceId": "svc-02",
+    "serviceTitle": "ถอดPVC ทาสีเจล",
+    "date": "2025-10-22",
+    "time": "18:30",
+    "createdAt": "2025-10-18T16:11:25.520Z",
+    "status": "CANCELLED",
+    "customerName": "ทท",
+    "phone": "0912345678",
+    "paymentMethod": "WALLET",
+    "paidAt": "2025-10-18T16:11:36.666Z"
+  },
+  {
+    "id": "bk_1760803777952",
+    "serviceId": "svc-01",
+    "serviceTitle": "ถอดPVC และต่อเล็บ",
+    "date": "2025-10-31",
+    "time": "17:00",
+    "createdAt": "2025-10-18T16:09:37.952Z",
+    "status": "CONFIRMED",
+    "customerName": "ll",
+    "phone": "0821234567",
+    "paymentMethod": "CASH",
+    "paidAt": "2025-10-18T16:10:08.306Z"
+  }
+]

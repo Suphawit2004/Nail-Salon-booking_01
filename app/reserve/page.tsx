@@ -1,3 +1,60 @@
-"use client";import {useMemo,useState,useEffect} from "react";import {useSearchParams,useRouter} from "next/navigation";import Image from "next/image";import {CalendarDays,Clock,Tag} from "lucide-react";import LayoutWrapper from "../components/LayoutWrapper";const OPEN=9,CLOSE=20;const TZ_OFFSET="+07:00";function todayISO(){const n=new Date();return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`;}function generateSlots(step=30){const a:string[]=[];for(let h=OPEN;h<CLOSE;h++){for(let m=0;m<60;m+=step){a.push(`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`)}}return a;}function toBkk(date?:string,time?:string){if(!date||!time)return null;return new Date(`${date}T${time}:00${TZ_OFFSET}`);}function isPast(date?:string,time?:string){const d=toBkk(date,time);return !d||d.getTime()<Date.now();}export default function ReservePage(){const q=useSearchParams();const router=useRouter();const serviceId=q.get("serviceId")??"svc-01";const serviceTitle=serviceId==="svc-01"?"ถอดPVC และต่อเล็บ":serviceId==="svc-02"?"ถอดPVC ทาสีเจล":"ทาสีเจล";const promoTitle=q.get("promoTitle")??"";const promoPrice=q.get("promoPrice")??"";const promoOld=q.get("promoOld")??"";const [date,setDate]=useState(todayISO());const [time,setTime]=useState("");const slots=useMemo(()=>generateSlots(30),[]);
-  const [taken,setTaken]=useState<string[]>([]);
-  useEffect(()=>{(async()=>{if(!date) return; const res=await fetch(`/api/slots?date=${date}`,{cache:"no-store"}); if(res.ok){ const d=await res.json(); setTaken(d.taken||[]);} })();},[date]);const next=()=>{if(!date||!time)return alert("กรุณาเลือกวันและเวลา");if(isPast(date,time))return alert("ไม่สามารถจองย้อนหลังได้ กรุณาเลือกเวลาถัดไป");const params=new URLSearchParams({serviceId,date,time,...(promoTitle?{promoTitle}:{}),...(promoPrice?{promoPrice}:{}),...(promoOld?{promoOld}:{}),}).toString();router.push(`/reserve/confirm?${params}`);};return(<LayoutWrapper><h2 className="text-sm font-semibold text-pink-600 mb-3 mt-4">เลือกวัน เวลา</h2><div className="rounded-3xl border border-pink-100 shadow-[0_6px_14px_rgba(255,182,193,0.25)] bg-pink-50/60 p-4"><div className="flex gap-3"><div className="relative w-[88px] h-[88px] rounded-2xl bg-white ring-1 ring-pink-100 overflow-hidden"><Image src="/nail-blank.png" alt="thumb" fill className="object-cover"/></div><div className="flex-1"><div className="font-semibold text-gray-800">{serviceTitle}</div>{!!promoTitle&&(<div className="mt-2 text-[13px] text-rose-700 flex items-center gap-2"><Tag className="h-4 w-4"/> โปร: <b>{promoTitle}</b>{promoPrice&&(<span className="ml-1"> — <span className="font-semibold">฿{Number(promoPrice).toLocaleString()}</span>{promoOld&&<span className="text-gray-400 line-through ml-2 text-xs">฿{Number(promoOld).toLocaleString()}</span>}</span>)}</div>)}<div className="rounded-2xl bg-white border border-pink-100 p-3 mt-2 text-[13px] text-gray-600"><p>รายละเอียด: ละเอียด ประณีต สวยคม สีทา/ขัดเล็บ</p></div></div></div><div className="grid sm:grid-cols-2 gap-4 mt-4"><label className="flex flex-col"><span className="text-sm text-gray-600 flex items-center gap-2"><CalendarDays className="h-4 w-4 text-pink-500"/>วันที่</span><input type="date" className="border rounded-xl p-2 text-sm mt-1 focus:outline-pink-400" value={date} min={todayISO()} onChange={e=>{setDate(e.target.value);setTime("");}}/></label></div><div className="mt-4"><div className="text-sm text-gray-600 mb-2 flex items-center gap-2"><Clock className="h-4 w-4 text-pink-500"/> เวลา (ทุกๆ 30 นาที)</div><div className="grid grid-cols-4 sm:grid-cols-6 gap-2">{slots.map(t=>{const disabled=!date||isPast(date,t)||taken.includes(t);const selected=time===t&&!disabled;return(<button key={t} type="button" onClick={()=>!disabled&&setTime(t)} disabled={disabled} className={["px-3 py-2 text-xs rounded-xl border transition",disabled?"opacity-40 cursor-not-allowed border-gray-200":selected?"bg-pink-400 text-white border-pink-400":"border-pink-200 hover:bg-pink-50"].join(" ")} title={disabled?"ไม่สามารถจองย้อนหลังได้":""}>{t}</button>);})}</div></div><div className="mt-4 flex justify-end gap-2"><button onClick={()=>history.back()} className="px-4 py-2 rounded-xl border border-pink-200 text-sm hover:bg-pink-50">ย้อนกลับ</button><button onClick={next} className="rounded-xl bg-pink-400 text-white px-6 py-2 text-sm font-semibold hover:bg-pink-500 shadow-sm">ถัดไป</button></div></div></LayoutWrapper>);}
+"use client";
+import { useMemo, useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import LayoutWrapper from "../components/LayoutWrapper";
+import { CalendarDays } from "lucide-react";
+
+const TZ = "+07:00";
+function todayStr(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}` }
+function genTimes(){ const arr:string[]=[]; for(let h=9; h<=20; h++){ for(const m of [0,30]) arr.push(`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`) } return arr }
+
+const SERVICES: Record<string,{title:string;detail:string}> = {
+  "svc-01": { title:"ถอดPVC และต่อเล็บ", detail:"ถอด pvc ต่อเล็บ ทาสีเจล สีคุม แน่นสวย\nอัปเกรดลายได้" },
+  "svc-02": { title:"ถอดpvc ทาสีเจล", detail:"ถอด pvc ทำความสะอาดโคนเล็บ\nทาสีเจล ครบทุกขั้นตอน" },
+  "svc-03": { title:"ทาสีเจล", detail:"ตะไบ ตัดหนัง ทาสีเจล\nโทนสวย ติดทน เงา" },
+};
+
+export default function ReservePage(){
+  const q = useSearchParams(); const router = useRouter();
+  const serviceId = q.get("serviceId") ?? "svc-03"; const meta = SERVICES[serviceId] ?? SERVICES["svc-03"];
+  const [date,setDate] = useState(todayStr()); const [time,setTime] = useState(""); const [taken,setTaken]=useState<Record<string,true>>({});
+  useEffect(()=>{ (async()=>{ const r=await fetch("/api/bookings",{cache:"no-store"}); const list=await r.json(); const m:Record<string,true>={}; (list||[]).forEach((b:any)=>{ if(b.status!=="CANCELLED") m[`${b.date} ${b.time}`]=true; }); setTaken(m); })(); },[]);
+  const times = useMemo(genTimes,[]);
+  const isPast = (d:string,t:string)=> new Date(`${d}T${t}:00${TZ}`).getTime() < Date.now();
+  const handleNext = async()=>{
+    if(!time){ alert("โปรดเลือกเวลา"); return; }
+    router.push(`/reserve/customer?serviceId=${serviceId}&date=${date}&time=${time}`);
+  };
+  return (
+    <LayoutWrapper>
+      <h2 className="text-sm font-semibold text-pink-600 mt-4">เลือกวัน เวลา</h2>
+      <div className="mt-2 rounded-[18px] bg-pink-50 ring-1 ring-pink-100 shadow-[0_10px_24px_rgba(255,182,193,.18)] p-4">
+        <h3 className="font-semibold text-gray-800">{meta.title}</h3>
+        <div className="mt-3">
+          <label className="block text-xs text-gray-500 mb-1">รายละเอียด</label>
+          <textarea readOnly value={meta.detail} className="w-full h-24 rounded-[14px] bg-white ring-1 ring-pink-100 p-3 text-[13px] leading-relaxed text-gray-700"/>
+        </div>
+        <div className="mt-4">
+          <label className="block text-xs text-gray-600 mb-1">วันที่จอง</label>
+          <div className="flex items-center gap-2">
+            <CalendarDays className="h-4 w-4 text-pink-500"/>
+            <input type="date" min={todayStr()} value={date} onChange={(e)=>{ setDate(e.target.value); setTime(""); }} className="flex-1 bg-transparent border-0 border-b border-gray-300 focus:outline-none focus:border-pink-400 text-sm pb-0.5"/>
+          </div>
+        </div>
+        <div className="mt-4">
+          <div className="block text-xs text-gray-600 mb-2">เวลาจอง</div>
+          <div className="grid grid-cols-6 gap-2 max-[360px]:grid-cols-4">
+            {times.map((t)=>{
+              const disabled = taken[`${date} ${t}`] || isPast(date,t);
+              const active = time===t;
+              return <button key={t} disabled={disabled} onClick={()=>setTime(t)} className={["h-9 rounded-full border text-[12px] transition-colors", active? "bg-pink-500 text-white border-pink-500":"border-gray-300 text-gray-700 hover:bg-pink-50", disabled? "opacity-40 cursor-not-allowed hover:bg-transparent":""].join(" ")}>{t}</button>
+            })}
+          </div>
+        </div>
+        <div className="mt-4 flex justify-end">
+          <button onClick={handleNext} className="px-5 py-2 rounded-lg bg-pink-500 text-white text-sm font-medium hover:bg-pink-600">ถัดไป</button>
+        </div>
+      </div>
+    </LayoutWrapper>
+  );
+}

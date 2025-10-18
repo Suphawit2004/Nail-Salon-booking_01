@@ -1,1 +1,18 @@
-import {readBookings} from "../../../lib/store";export async function GET(req:Request){const encoder=new TextEncoder();let last="";const stream=new ReadableStream({async start(controller){const write=(c:string)=>controller.enqueue(encoder.encode(c));const push=async()=>{const list=await readBookings();const snap=JSON.stringify(list);if(snap!==last){last=snap;write(`data: ${snap}\n\n`);}};await push();const tick=setInterval(push,2000);const ping=setInterval(()=>write(`event: ping\ndata: {}\n\n`),15000);const close=()=>{clearInterval(tick);clearInterval(ping);try{controller.close();}catch{}};/*@ts-ignore*/req?.signal?.addEventListener?.("abort",close);}});return new Response(stream,{headers:{"Content-Type":"text/event-stream; charset=utf-8","Cache-Control":"no-cache, no-transform","Connection":"keep-alive"}});}
+import { readBookings } from "../../../lib/store";
+export async function GET() {
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream({
+    async start(controller) {
+      async function send() {
+        const data = await readBookings();
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+      }
+      await send();
+      const iv = setInterval(send, 2000);
+      // @ts-ignore
+      controller._iv = iv;
+    },
+    cancel() { /* @ts-ignore */ clearInterval((this as any)._iv); }
+  });
+  return new Response(stream, { headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", "Connection": "keep-alive" } });
+}

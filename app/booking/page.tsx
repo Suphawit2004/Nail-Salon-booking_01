@@ -1,1 +1,38 @@
-"use client";import Image from "next/image";import Link from "next/link";import LayoutWrapper from "../components/LayoutWrapper";type Service={id:string;title:string;bullets:string[];note?:string};const SERVICES:Service[]=[{id:"svc-01",title:"ถอดPVC และต่อเล็บ",bullets:["งานละเอียด","ทรงสวย","ฟรีตะไบ/ขัดผิวเล็บ","สีทา"],note:"*เวลาโดยประมาณ 90–120 นาที"},{id:"svc-02",title:"ถอดPVC ทาสีเจล",bullets:["คละสีฟรี","โทนสุภาพ/นู้ด","ฟรีตะไบ/ขัดผิวเล็บ"],note:"*ประมาณ 60–90 นาที"},{id:"svc-03",title:"ทาสีเจล",bullets:["งานละเอียด","ล้างเก่า/ทำความสะอาด","สีทา"],note:"*ประมาณ 45–60 นาที"},];export default function BookingPage(){return(<LayoutWrapper><h2 className="text-sm font-semibold text-pink-600 mb-3 mt-4">เลือกบริการ</h2><div className="space-y-5">{SERVICES.map(s=>(<article key={s.id} className="rounded-3xl border border-pink-100 bg-pink-50/65 shadow-[0_6px_14px_rgba(255,182,193,0.25)] p-4"><div className="flex gap-4"><div className="relative w-[90px] h-[90px] rounded-2xl bg-white ring-1 ring-pink-100 overflow-hidden"><Image src="/nail-blank.png" alt="thumb" fill className="object-cover"/></div><div className="flex-1"><h3 className="font-semibold text-gray-800">{s.title}</h3><div className="rounded-2xl bg-white border border-pink-100 p-3 mt-1 text-[13px] text-gray-600"><ul className="list-disc pl-5 space-y-0.5">{s.bullets.map((b,i)=>(<li key={i}>{b}</li>))}</ul>{s.note&&<p className="text-[12px] text-gray-400 mt-2">{s.note}</p>}</div><div className="mt-2 flex justify-end"><Link href={`/reserve?serviceId=${s.id}`} className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-pink-400 hover:bg-pink-500 shadow-sm">จอง</Link></div></div></div></article>))}</div></LayoutWrapper>);}
+"use client";
+import Image from "next/image";
+import Link from "next/link";
+import LayoutWrapper from "../components/LayoutWrapper";
+
+type Service = { id:string; title:string; desc:string[]; img?:string };
+const services: Service[] = [
+  { id:"svc-01", title:"ถอดPVC และต่อเล็บ", desc:["รายละเอียด","ถอด pvc ต่อเล็บ ทาสีเจล สีคุม แน่นสวย","อัปเกรดลายได้"], img:"/nail-blank.png" },
+  { id:"svc-02", title:"ถอดpvc ทาสีเจล", desc:["รายละเอียด","ถอด pvc ทำความสะอาดโคนเล็บ","ทาสีเจล ครบทุกขั้นตอน"], img:"/nail-blank.png" },
+  { id:"svc-03", title:"ทาสีเจล", desc:["รายละเอียด","ตะไบ ตัดหนัง ทาสีเจล","รับประกันสีตรง โทนสวย"], img:"/nail-blank.png" },
+];
+export default function BookingPage(){
+  return (
+    <LayoutWrapper>
+      <h2 className="text-sm font-semibold text-pink-600 mt-4 mb-3">เลือกบริการ</h2>
+      <ul className="space-y-4 pb-24">
+        {services.map(s=>(
+          <li key={s.id} className="rounded-[18px] bg-pink-50 ring-1 ring-pink-100 shadow-[0_10px_24px_rgba(255,182,193,.18)] p-4">
+            <div className="flex gap-4">
+              <div className="relative w-[105px] h-[105px] rounded-xl overflow-hidden bg-white ring-1 ring-pink-100 shrink-0">
+                <Image src={s.img ?? '/nail-blank.png'} alt={s.title} fill className="object-cover"/>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-gray-800">{s.title}</h3>
+                <div className="mt-2 rounded-[14px] bg-white ring-1 ring-pink-100 p-2 text-[12px] leading-relaxed text-gray-700">
+                  {s.desc.map((line,i)=>(<div key={i} className={i===0? "font-medium text-gray-600 mb-1":""}>{line}</div>))}
+                </div>
+                <div className="mt-2 flex justify-end">
+                  <Link href={`/reserve?serviceId=${s.id}`} className="px-4 py-1.5 rounded-lg bg-pink-500 text-white text-xs font-medium hover:bg-pink-600">จอง</Link>
+                </div>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </LayoutWrapper>
+  );
+}
