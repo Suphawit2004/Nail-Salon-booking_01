@@ -8,6 +8,15 @@ import LayoutWrapper from "../components/LayoutWrapper";
 
 const OPEN = 9;
 const CLOSE = 20;
+const TZ_OFFSET = "+07:00";
+
+function todayISO() {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
 
 function generateSlots(stepMin = 30){
   const slots:string[] = [];
@@ -21,18 +30,29 @@ function generateSlots(stepMin = 30){
   return slots;
 }
 
+function toBangkokDate(dateStr: string, timeStr: string) {
+  if (!dateStr || !timeStr) return null;
+  return new Date(`${dateStr}T${timeStr}:00${TZ_OFFSET}`);
+}
+function isPastSlot(dateStr: string, timeStr: string) {
+  const d = toBangkokDate(dateStr, timeStr);
+  if (!d) return true;
+  return d.getTime() < Date.now();
+}
+
 export default function ReservePage(){
   const q = useSearchParams();
   const router = useRouter();
   const serviceId = q.get("serviceId") ?? "svc-01";
   const serviceTitle = serviceId==="svc-01" ? "ถอดPVC และต่อเล็บ" : serviceId==="svc-02" ? "ถอดPVC ทาสีเจล" : "ทาสีเจล";
 
-  const [date,setDate] = useState("");
+  const [date,setDate] = useState(todayISO());
   const [time,setTime] = useState("");
   const slots = useMemo(()=> generateSlots(30),[]);
 
   const handleNext = ()=>{
     if(!date || !time) return alert("กรุณาเลือกวันและเวลา");
+    if(isPastSlot(date, time)) return alert("ไม่สามารถจองย้อนหลังได้ กรุณาเลือกเวลาถัดไป");
     router.push(`/reserve/confirm?serviceId=${serviceId}&date=${date}&time=${time}`);
   };
 
@@ -56,16 +76,30 @@ export default function ReservePage(){
         <div className="grid sm:grid-cols-2 gap-4 mt-4">
           <label className="flex flex-col">
             <span className="text-sm text-gray-600 flex items-center gap-2"><CalendarDays className="h-4 w-4 text-pink-500"/>วันที่</span>
-            <input type="date" className="border rounded-xl p-2 text-sm mt-1 focus:outline-pink-400" value={date} onChange={e=>setDate(e.target.value)}/>
+            <input type="date" className="border rounded-xl p-2 text-sm mt-1 focus:outline-pink-400" value={date} min={todayISO()} onChange={e=>{ setDate(e.target.value); setTime(""); }}/>
           </label>
         </div>
 
         <div className="mt-4">
           <div className="text-sm text-gray-600 mb-2 flex items-center gap-2"><Clock className="h-4 w-4 text-pink-500"/> เวลา (ทุกๆ 30 นาที)</div>
           <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-            {slots.map(t=>(
-              <button key={t} type="button" onClick={()=>setTime(t)} className={"px-3 py-2 text-xs rounded-xl border transition " + (time===t ? "bg-pink-400 text-white border-pink-400" : "border-pink-200 hover:bg-pink-50")}>{t}</button>
-            ))}
+            {slots.map(t=>{
+              const disabled = !date || isPastSlot(date, t);
+              const selected = time===t && !disabled;
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={()=>!disabled && setTime(t)}
+                  disabled={disabled}
+                  className={["px-3 py-2 text-xs rounded-xl border transition",
+                    disabled ? "opacity-40 cursor-not-allowed border-gray-200" :
+                    selected ? "bg-pink-400 text-white border-pink-400" : "border-pink-200 hover:bg-pink-50"
+                  ].join(" ")}
+                  title={disabled ? "ไม่สามารถจองย้อนหลังได้" : ""}
+                >{t}</button>
+              );
+            })}
           </div>
         </div>
 

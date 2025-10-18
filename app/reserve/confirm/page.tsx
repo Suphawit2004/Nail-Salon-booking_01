@@ -5,6 +5,13 @@ import { CalendarDays, Clock, User2 } from "lucide-react";
 import LayoutWrapper from "../../components/LayoutWrapper";
 import { useMemo, useState } from "react";
 
+const TZ_OFFSET = "+07:00";
+function isPast(date: string, time: string) {
+  if (!date || !time) return true;
+  const when = new Date(`${date}T${time}:00${TZ_OFFSET}`);
+  return when.getTime() < Date.now();
+}
+
 export default function ConfirmPage(){
   const q = useSearchParams();
   const router = useRouter();
@@ -16,6 +23,7 @@ export default function ConfirmPage(){
 
   const handleCreate = async ()=>{
     if(!serviceId || !date || !time){ alert("กรุณาเลือกบริการ/วัน/เวลาให้ครบ"); return; }
+    if (isPast(date, time)) { alert("ไม่สามารถจองย้อนหลังได้ กรุณาเลือกเวลาใหม่"); router.push(`/reserve?serviceId=${serviceId}`); return; }
     try{
       setSubmitting(true);
       const res = await fetch("/api/bookings", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ serviceId, serviceTitle:title, date, time }) });

@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import { readBookings, writeBookings, type Booking } from "../../lib/store";
 
+const TZ_OFFSET = "+07:00";
+function isPast(date: string, time: string) {
+  if (!date || !time) return true;
+  const when = new Date(`${date}T${time}:00${TZ_OFFSET}`);
+  if (isNaN(when.getTime())) return true;
+  return when.getTime() < Date.now();
+}
+
 export async function GET(){
   const list = await readBookings();
   list.sort((a,b)=> a.createdAt < b.createdAt ? 1 : -1);
@@ -14,6 +22,11 @@ export async function POST(req:Request){
     if(!serviceId || !serviceTitle || !date || !time){
       return NextResponse.json({ error: "invalid payload" }, { status: 400 });
     }
+
+    if (isPast(date, time)) {
+      return NextResponse.json({ error: "ไม่สามารถจองย้อนหลังได้" }, { status: 400 });
+    }
+
     const booking: Booking = {
       id: `bk_${Date.now()}`,
       serviceId, serviceTitle, date, time,
