@@ -3,10 +3,12 @@
 @tailwind components;
 @tailwind utilities;
 
-html,body{height:100%}
-body{@apply bg-[#fff7fb] text-gray-800}
+html,html{@apply bg-[linear-gradient(180deg,#ffd3e2_0%,#ffe0ea_40%,#fff5f9_100%)]}
+body{height:100%}
+html{@apply bg-[linear-gradient(180deg,#ffd3e2_0%,#ffe0ea_40%,#fff5f9_100%)]}
+body{@apply bg-gradient-to-b from-[#ffd3e2] via-[#ffe0ea] to-[#fff5f9] text-gray-800}
 .app-banner{background:linear-gradient(180deg,#ffd3e2 0%,#ffe9f1 55%,#fff7fb 100%)}
-.card{@apply rounded-3xl border border-pink-100 bg-white shadow-soft}
+.card{@apply rounded-3xl border border-white/70 bg-white shadow-soft}
 .bottom-blur{backdrop-filter:saturate(180%) blur(6px)}
 .page-pad-bottom{padding-bottom:6rem}
 

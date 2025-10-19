@@ -38,7 +38,7 @@ export default function PayInfoPage(){
   return (
     <LayoutWrapper>
       <h2 className="text-sm font-semibold text-pink-600 mb-3 mt-4">ข้อมูลผู้จอง</h2>
-      <div className="rounded-2xl border p-3">
+      <div className="rounded-2xl border border-pink-200 bg-pink-50/60 p-3">
         <div className="font-medium">{bk.serviceTitle}</div>
         <div className="text-sm text-gray-600 mt-1">วันที่: {bk.date} เวลา: {bk.time}</div>
         <div className="grid sm:grid-cols-2 gap-3 mt-3">

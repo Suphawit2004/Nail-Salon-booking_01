@@ -32,7 +32,7 @@ export default function Checkout(){
   const copyText = async (t:string)=>{ try{ await navigator.clipboard.writeText(t); alert("คัดลอกแล้ว"); }catch{} };
 
   const BankPanel = () => (
-    <div className="rounded-2xl border border-pink-100 bg-pink-50/40 p-3">
+    <div className="rounded-2xl border border-pink-200 bg-pink-50/70 p-3">
       <div className="text-sm">โอนเข้าบัญชีธนาคาร</div>
       <div className="mt-2 grid grid-cols-[100px_1fr] gap-y-1 text-sm max-sm:grid-cols-1">
         <div className="text-gray-600">ธนาคาร</div><div className="font-medium">{BANK_INFO.bank}</div>
@@ -50,7 +50,7 @@ export default function Checkout(){
   );
 
   const PromptPanel = () => (
-    <div className="rounded-2xl border border-pink-100 bg-pink-50/40 p-3">
+    <div className="rounded-2xl border border-pink-200 bg-pink-50/70 p-3">
       <div className="text-sm mb-2">พร้อมเพย์ (PromptPay)</div>
       <div className="flex items-start gap-3 max-sm:flex-col">
         <div className="shrink-0">
@@ -117,7 +117,7 @@ useEffect(()=>{(async()=>{ const r=await fetch(`/api/bookings/${id}`,{cache:"no-
             const Active = method===m.key;
             const Icon = m.icon as any;
             return (
-              <button key={m.key} type="button" onClick={()=>setMethod(m.key)} className={`text-left rounded-2xl p-3 border ${Active?"border-pink-400 ring-2 ring-pink-100 bg-white":"border-gray-200 hover:bg-pink-50"}`}>
+              <button key={m.key} type="button" onClick={()=>setMethod(m.key)} className={`text-left rounded-2xl p-3 border ${Active?"border-pink-400 ring-2 ring-pink-200 bg-white":"border-gray-200 hover:bg-pink-50"}`}>
                 <div className="flex items-center gap-3">
                   <Icon className={`h-5 w-5 ${Active?"text-pink-600":"text-gray-500"}`}/>
                   <div className="flex-1">
@@ -131,7 +131,7 @@ useEffect(()=>{(async()=>{ const r=await fetch(`/api/bookings/${id}`,{cache:"no-
           })}
         </div>
 
-        <div className="mt-3 rounded-xl bg-white border border-pink-100 p-3 text-sm">
+        <div className="mt-3 rounded-xl bg-pink-50/60 border border-pink-200 p-3 text-sm">
           <div className="flex items-start gap-2">
             <div className="flex-1">
               <div className="font-medium">ยืนยันการชำระเงิน</div>

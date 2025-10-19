@@ -13,7 +13,7 @@ const items = [
 export default function BottomNav(){
   const pathname = usePathname();
   return (
-    <nav className="fixed bottom-0 left-0 right-0 border-t border-pink-100 bg-gradient-to-t from-pink-50/95 to-white/50 backdrop-blur-sm" style={{paddingBottom: "calc(env(safe-area-inset-bottom, 0px))"}}>
+    <nav className="fixed bottom-0 left-0 right-0 bg-[linear-gradient(180deg,#ffd3e2_0%,#ffe0ea_40%,#fff5f9_100%)] border-t border-transparent" style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px))" }}>
       <ul className="mx-auto grid max-w-sm grid-cols-5 py-2">
         {items.map(({href,label,Icon})=>{
           const active = pathname===href;
