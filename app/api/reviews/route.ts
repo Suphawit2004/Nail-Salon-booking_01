@@ -1,3 +1,4 @@
+import { writeLog } from "@/lib/log";
 import { NextResponse } from "next/server";
 import { readReviews, writeReview, type Review } from "@/lib/reviews";
 
@@ -16,6 +17,7 @@ export async function POST(req: Request){
     if(!(rating>=1 && rating<=5) || !comment) return NextResponse.json({error:"bad-request"}, {status:400});
     const r: Review = { id:`rv_${Date.now()}`, rating, comment, name, bookingId, createdAt:new Date().toISOString() };
     await writeReview(r);
+    try{ await writeLog({id:`lg_${Date.now()}`, type:"REVIEW_CREATE", payload:r, createdAt:new Date().toISOString()}); }catch{}
     return NextResponse.json(r);
   }catch{
     return NextResponse.json({error:"internal"}, {status:500});

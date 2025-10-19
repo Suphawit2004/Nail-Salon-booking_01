@@ -1,17 +1,46 @@
-import { SERVICES } from "@/lib/catalog";
-
+import { writeLog } from "@/lib/log";
 import { NextResponse } from "next/server";
 import { readBookings, writeBooking, type Booking } from "@/lib/store";
-const TZ = "+07:00";
-const isPast = (date:string,time:string)=> new Date(`${date}T${time}:00${TZ}`).getTime() < Date.now();
-export async function GET(){ const list=await readBookings(); return NextResponse.json(list.sort((a,b)=>b.createdAt.localeCompare(a.createdAt))); }
-export async function POST(req:Request){
+import { SERVICES } from "@/lib/catalog";
+
+export async function GET(req: Request){
+  const { searchParams } = new URL(req.url);
+  const status = searchParams.get("status"); // optional: PENDING|PAID|DONE|CANCELLED|ALL
+  const list = await readBookings();
+  let data = list;
+  if(status && status !== "ALL"){
+    data = list.filter(b => b.status === status);
+  }
+  // newest first
+  data = data.slice().sort((a,b)=> b.createdAt.localeCompare(a.createdAt));
+  return NextResponse.json(data);
+}
+
+export async function POST(req: Request){
   try{
-    const {serviceId,serviceTitle,date,time} = await req.json();
-    if(!serviceId||!date||!time) return NextResponse.json({error:"bad-request"},{status:400});
-    if(isPast(date,time)) return NextResponse.json({error:"past-not-allowed"},{status:400});
-    const bk:Booking={id:`bk_${Date.now()}`,serviceId,serviceTitle,date,time,status:"PENDING",createdAt:new Date().toISOString()};
+    const body = await req.json();
+    const serviceId = String(body?.serviceId||"");
+    const date = String(body?.date||"");
+    const time = String(body?.time||"");
+    if(!serviceId || !date || !time){
+      return NextResponse.json({error:"serviceId, date, time required"}, {status:400});
+    }
+    const title = (body?.serviceTitle ?? SERVICES[serviceId]?.title ?? "ไม่ระบุบริการ") as string;
+    const bk: Booking = {
+      id: `bk_${Date.now()}`,
+      serviceId,
+      serviceTitle: title,
+      date,
+      time,
+      status: "PENDING",
+      createdAt: new Date().toISOString(),
+      name: body?.name,
+      phone: body?.phone,
+    };
     await writeBooking(bk);
-    return NextResponse.json(bk);
-  }catch{ return NextResponse.json({error:"internal"},{status:500}); }
+    await writeLog({id:`lg_${Date.now()}`, type:"BOOKING_CREATE", bookingId: bk.id, payload: bk, createdAt: new Date().toISOString()});
+    return NextResponse.json(bk, {status:201});
+  }catch{
+    return NextResponse.json({error:"internal"}, {status:500});
+  }
 }

@@ -1,3 +1,4 @@
+import { writeLog } from "@/lib/log";
 import { NextResponse } from "next/server";
 import { findBooking, updateBooking } from "@/lib/store";
 export async function GET(_:Request,{params}:{params:{id:string}}){ const bk=findBooking(params.id); if(!bk) return NextResponse.json({message:"not found"},{status:404}); return NextResponse.json(bk); }

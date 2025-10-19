@@ -1,5 +1,5 @@
-import LayoutWrapper from "@/app/components/LayoutWrapper";
 "use client";
+import LayoutWrapper from "@/app/components/LayoutWrapper";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 export default function PaySuccess(){

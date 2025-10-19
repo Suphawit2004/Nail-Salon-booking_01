@@ -18,7 +18,7 @@ export default function BookingPage(){
                 <h3 className="font-semibold text-gray-800">{s.title}</h3>
                 <p className="text-sm text-gray-500 mt-1">{s.desc}</p>
               </div>
-              <Link href={`/reserve/day?serviceId=${s.id}`} className="px-3 py-1.5 rounded-lg text-xs bg-pink-500 text-white">จอง</Link>
+              <Link href={`/reserve/select?serviceId=${s.id}`} className="px-3 py-1.5 rounded-lg text-xs bg-pink-500 text-white">จอง</Link>
             </div>
           </article>
         ))}

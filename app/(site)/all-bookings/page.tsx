@@ -6,6 +6,17 @@ type Booking={id:string,serviceTitle:string,date:string,time:string,status:"PEND
 
 const fetcher = (u:string)=>fetch(u).then(r=>r.json());
 
+
+const statusBadge = (s:string)=>{
+  const map:any = {
+    PENDING: "bg-amber-100 text-amber-700 border-amber-200",
+    PAID: "bg-pink-100 text-pink-700 border-pink-200",
+    DONE: "bg-emerald-100 text-emerald-700 border-emerald-200",
+    CANCELLED: "bg-gray-100 text-gray-600 border-gray-200"
+  };
+  return `inline-block px-2 py-0.5 text-[11px] rounded-full border ${map[s]||"bg-gray-100 text-gray-600 border-gray-200"}`;
+};
+
 export default function AllBookingsPage(){
   const {data, mutate} = useSWR<Booking[]>("/api/bookings", fetcher, {refreshInterval:5000});
   const [tab,setTab] = useState<"WAITING"|"DONE"|"CANCELLED">("WAITING");
@@ -30,10 +41,7 @@ export default function AllBookingsPage(){
           {list.map(b=>(
             <article key={b.id} className="rounded-2xl border border-pink-100 bg-white p-4 shadow-soft">
               <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-semibold">{b.serviceTitle}</p>
-                  <p className="text-xs text-gray-600 mt-1">วันที่ {b.date} • เวลา {b.time}</p>
-                </div>
+                <div><p className="font-semibold">{b.serviceTitle}</p><p className="text-xs text-gray-600 mt-1">วันที่ {b.date} • เวลา {b.time}</p><div className="mt-1"><span className="{statusBadge(b.status)}">{b.status}</span></div></div>
                 <div className="flex gap-2">
                   {(b.status==="PENDING"||b.status==="PAID") && <button onClick={()=>cancel(b.id)} className="px-3 py-1.5 rounded-lg border text-xs">ยกเลิก</button>}
                 </div>

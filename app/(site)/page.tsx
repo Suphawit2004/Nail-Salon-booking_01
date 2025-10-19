@@ -43,5 +43,20 @@ export default function HomePage(){
         </div>
       </section>
     </div>
+  
+      <section className="px-4 mt-6">
+        <div className="card p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-sm text-pink-600 font-semibold">โปรโมชันพิเศษ</p>
+              <p className="text-sm text-gray-700 mt-1">ถอดpvc + ต่อเล็บ + ทาสีเจล — ราคาโปร</p>
+            </div>
+            <a href="/reserve/select?serviceId=svc-01" className="px-4 py-2 rounded-xl bg-pink-500 text-white text-sm">จองโปรโมชัน</a>
+          </div>
+        </div>
+      </section>
   );
 }
+
+      
+    
