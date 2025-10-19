@@ -3,20 +3,33 @@
 @tailwind components;
 @tailwind utilities;
 
-html,body{height:100%}
-body{@apply bg-[#fff7fb] text-gray-800}
-.app-banner{background:linear-gradient(180deg,#ffd3e2 0%,#ffe9f1 55%,#fff7fb 100%)}
-.card{@apply rounded-3xl border border-pink-100 bg-white shadow-soft}
-.bottom-blur{backdrop-filter:saturate(180%) blur(6px)}
-.page-pad-bottom{padding-bottom:6rem}
-
-
-@layer utilities{
-  .shadow-soft{
-    --tw-shadow: 0 8px 24px rgba(244,63,94,.15);
-    --tw-shadow-colored: 0 8px 24px var(--tw-shadow-color);
-    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
-                var(--tw-ring-shadow, 0 0 #0000),
-                var(--tw-shadow);
+@layer base {
+  :root {
+    --bg: #fff7fb;
+    --pink-50: #ffeaf2;
+    --pink-100:#ffd6e6;
+    --pink-500:#f43f8f;
   }
+  html, body, :root { height: 100%; }
+  body { @apply bg-[var(--bg)] text-gray-800 antialiased; }
+}
+
+@layer components {
+  .section { @apply mx-auto w-full max-w-screen-md px-4 pt-4 pb-28; }
+  .banner  { @apply bg-gradient-to-b from-pink-200 via-pink-100 to-[var(--bg)]; }
+  .card        { @apply rounded-2xl border border-pink-100 bg-white p-4; }
+  .card-pink   { @apply rounded-2xl border border-pink-100 bg-[var(--pink-50)] p-4 shadow-soft; }
+  .card-inner  { @apply rounded-xl border border-pink-100 bg-white p-3; }
+  .btn         { @apply inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm transition; }
+  .btn-primary { @apply btn bg-pink-500 text-white hover:bg-pink-600; }
+  .btn-ghost   { @apply btn text-pink-600; }
+  .btn-outline { @apply btn border border-pink-200 hover:border-pink-400; }
+  .tabbar      { @apply fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t border-pink-100; }
+  .tabbar-in   { @apply mx-auto max-w-screen-md grid grid-cols-5 gap-4 px-6 py-3 text-xs; }
+  .service-card { @apply card-pink flex items-center gap-4; }
+  .service-thumb { @apply h-24 w-24 rounded-xl overflow-hidden bg-white border border-pink-100; }
+}
+@layer utilities {
+  .shadow-soft { box-shadow: 0 10px 24px rgba(244,63,143,.15); }
+  .page-pad-bottom { padding-bottom: 6rem; }
 }

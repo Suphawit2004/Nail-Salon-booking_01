@@ -10,7 +10,7 @@ export default function PaySuccess(){
     <>
       <BackBar title="ชำระเงินสำเร็จ" href="/all-bookings" />
       <section className="px-4 mt-10 text-center">
-        <div className="inline-block rounded-2xl border border-pink-100 bg-white px-8 py-10 shadow-soft">
+        <div className="inline-block rounded-2xl border border-pink-100 bg-white px-8 py-10 shadow">
           <div className="mx-auto mb-3 h-16 w-16 rounded-full grid place-items-center border border-emerald-200 bg-emerald-50 text-emerald-600">✓</div>
           <p className="font-semibold">ชำระเงินสำเร็จ</p>
         </div>

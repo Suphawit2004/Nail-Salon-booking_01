@@ -1,46 +1,20 @@
-import { writeLog } from "@/lib/log";
 import { NextResponse } from "next/server";
-import { readBookings, writeBooking, type Booking } from "@/lib/store";
-import { SERVICES } from "@/lib/catalog";
+import { promises as fs } from "fs";
+import path from "path";
 
-export async function GET(req: Request){
-  const { searchParams } = new URL(req.url);
-  const status = searchParams.get("status"); // optional: PENDING|PAID|DONE|CANCELLED|ALL
-  const list = await readBookings();
-  let data = list;
-  if(status && status !== "ALL"){
-    data = list.filter(b => b.status === status);
-  }
-  // newest first
-  data = data.slice().sort((a,b)=> b.createdAt.localeCompare(a.createdAt));
-  return NextResponse.json(data);
-}
+const filePath = path.join(process.cwd(), "var", "bookings.json");
+async function readAll(){ try{ const s=await fs.readFile(filePath,"utf8"); return JSON.parse(s||"[]"); }catch{ return []; } }
+async function writeAll(list:any){ await fs.mkdir(path.dirname(filePath),{recursive:true}); await fs.writeFile(filePath, JSON.stringify(list,null,2), "utf8"); }
 
-export async function POST(req: Request){
-  try{
-    const body = await req.json();
-    const serviceId = String(body?.serviceId||"");
-    const date = String(body?.date||"");
-    const time = String(body?.time||"");
-    if(!serviceId || !date || !time){
-      return NextResponse.json({error:"serviceId, date, time required"}, {status:400});
-    }
-    const title = (body?.serviceTitle ?? SERVICES[serviceId]?.title ?? "ไม่ระบุบริการ") as string;
-    const bk: Booking = {
-      id: `bk_${Date.now()}`,
-      serviceId,
-      serviceTitle: title,
-      date,
-      time,
-      status: "PENDING",
-      createdAt: new Date().toISOString(),
-      name: body?.name,
-      phone: body?.phone,
-    };
-    await writeBooking(bk);
-    await writeLog({id:`lg_${Date.now()}`, type:"BOOKING_CREATE", bookingId: bk.id, payload: bk, createdAt: new Date().toISOString()});
-    return NextResponse.json(bk, {status:201});
-  }catch{
-    return NextResponse.json({error:"internal"}, {status:500});
-  }
+export async function GET(){ const list = await readAll(); return NextResponse.json(list); }
+
+export async function POST(req:Request){
+  const body = await req.json();
+  const list = await readAll();
+  const id = "bk_" + Math.random().toString(36).slice(2,10);
+  const now = new Date().toISOString();
+  const item = { id, status:"PENDING", createdAt: now, ...body };
+  list.push(item);
+  await writeAll(list);
+  return NextResponse.json(item, { status:201 });
 }

@@ -1,8 +1,9 @@
 
 import type { Config } from "tailwindcss";
 const config: Config = {
-  content: ["./app/**/*.{js,ts,jsx,tsx,mdx}","./components/**/*.{js,ts,jsx,tsx,mdx}"],
-  theme: { extend: { colors: { brand: { 500:"#f43f5e" } }, boxShadow:{ soft:"0 8px 24px rgba(244,63,94,.15)" } } },
+  content: ["./app/**/*.{ts,tsx,js,jsx}", "./components/**/*.{ts,tsx,js,jsx}", "./lib/**/*.{ts,tsx,js,jsx}"],
+  theme: { extend: {} },
+  safelist: ["banner","section","card","card-pink","card-inner","btn","btn-primary","btn-ghost","btn-outline","tabbar","tabbar-in","service-card","service-thumb","shadow-soft","page-pad-bottom"],
   plugins: [],
 };
 export default config;

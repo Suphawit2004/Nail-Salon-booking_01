@@ -44,7 +44,7 @@ export default function ConfirmPage(){
     <>
       <BackBar title="ยืนยันการจอง" href={backHref} />
       <section className="px-4 mt-4 pb-24">
-        <div className="rounded-2xl border border-pink-100 bg-white p-4 shadow-soft">
+        <div className="rounded-2xl border border-pink-100 bg-white p-4 shadow">
           <div className="flex gap-4">
             <div className="h-24 w-24 rounded-2xl overflow-hidden bg-pink-50 border border-pink-100 shrink-0">
               <img src={s?.img || "/work1.jpg"} alt={s?.title || "service"} className="h-full w-full object-cover" />
@@ -60,7 +60,7 @@ export default function ConfirmPage(){
             <button
               onClick={createAndGo}
               disabled={loading || !s || !date || !time}
-              className="px-4 py-2 rounded-xl bg-pink-500 text-white text-sm disabled:opacity-50"
+              className="px-4 py-2 rounded-2xl bg-pink-500 text-white text-sm disabled:opacity-50"
             >
               {loading ? "กำลังสร้างการจอง…" : "ยืนยัน"}
             </button>
