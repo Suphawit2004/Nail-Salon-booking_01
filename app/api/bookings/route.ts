@@ -1,20 +1,18 @@
+import { SERVICES } from "@/lib/catalog";
+
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
-
-const filePath = path.join(process.cwd(), "var", "bookings.json");
-async function readAll(){ try{ const s=await fs.readFile(filePath,"utf8"); return JSON.parse(s||"[]"); }catch{ return []; } }
-async function writeAll(list:any){ await fs.mkdir(path.dirname(filePath),{recursive:true}); await fs.writeFile(filePath, JSON.stringify(list,null,2), "utf8"); }
-
-export async function GET(){ const list = await readAll(); return NextResponse.json(list); }
-
+import { readBookings, writeBooking, type Booking } from "@/lib/store";
+const TZ = "+07:00";
+const isPast = (date:string,time:string)=> new Date(`${date}T${time}:00${TZ}`).getTime() < Date.now();
+export async function GET(){ const list=await readBookings(); return NextResponse.json(list.sort((a,b)=>b.createdAt.localeCompare(a.createdAt))); }
 export async function POST(req:Request){
-  const body = await req.json();
-  const list = await readAll();
-  const id = "bk_" + Math.random().toString(36).slice(2,10);
-  const now = new Date().toISOString();
-  const item = { id, status:"PENDING", createdAt: now, ...body };
-  list.push(item);
-  await writeAll(list);
-  return NextResponse.json(item, { status:201 });
+  try{
+    const { serviceId, date, time } = await req.json();
+    const serviceTitle = SERVICES[serviceId]?.title ?? "";
+    if(!serviceId||!date||!time) return NextResponse.json({error:"bad-request"},{status:400});
+    if(isPast(date,time)) return NextResponse.json({error:"past-not-allowed"},{status:400});
+    const bk:Booking={id:`bk_${Date.now()}`,serviceId,serviceTitle,date,time,status:"PENDING",createdAt:new Date().toISOString()};
+    await writeBooking(bk);
+    return NextResponse.json(bk);
+  }catch{ return NextResponse.json({error:"internal"},{status:500}); }
 }

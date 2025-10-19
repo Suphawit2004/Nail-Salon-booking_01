@@ -1,1 +1,0 @@
-export const SHOWCASE = ["/work1.jpg","/work2.jpg","/work3.jpg","/idea1.jpg","/idea2.jpg"];

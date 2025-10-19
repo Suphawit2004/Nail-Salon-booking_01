@@ -7,7 +7,7 @@ export async function GET(req: Request) {
   if (!date) return NextResponse.json({ error: "date required" }, { status: 400 });
   const list = await readBookings();
   const taken = list
-    .filter(b => b.date === date && b.status !== "CANCELLED")
+    .filter(b => b.date === date && (b.status === "PAID" || b.status === "DONE"))
     .map(b => b.time);
   return NextResponse.json({ date, taken });
 }

@@ -1,30 +1,16 @@
 
-"use client";
-
-import Link from "next/link";
 import Image from "next/image";
-import logo from "@/public/logo.png";
-
-export default function LayoutWrapper({ children }:{ children: React.ReactNode }){
+import BottomNav from "@/app/components/BottomNav";
+export default function LayoutWrapper({children}:{children:React.ReactNode}){
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg)]">
+    <div className="mx-auto min-h-screen max-w-screen-sm bg-white">
       <header className="app-banner">
-        <div className="mx-auto max-w-screen-md px-4 py-6 flex items-center justify-center">
-          <Image src={logo} alt="Min Nail Studio" className="h-16 w-auto object-contain" />
+        <div className="mx-auto flex h-36 max-w-screen-sm items-center justify-center">
+          <Image src="/logo.png" alt="Min Nail Studio" width={160} height={120}/>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-screen-md page-pad-bottom">
-        {children}
-      </main>
-      <nav className="tabbar">
-        <div className="tabbar-inner">
-          <Link href="/" className="text-center text-xs">หน้าแรก</Link>
-          <Link href="/booking" className="text-center text-xs">จองคิว</Link>
-          <Link href="/all-bookings" className="text-center text-xs">จองทั้งหมด</Link>
-          <Link href="/reviews" className="text-center text-xs">รีวิว</Link>
-          <Link href="/profile" className="text-center text-xs">ผู้ดูแล</Link>
-        </div>
-      </nav>
+      <main className="page-pad-bottom">{children}</main>
+      <BottomNav/>
     </div>
   );
 }
