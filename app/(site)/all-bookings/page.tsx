@@ -2,7 +2,7 @@
 "use client";
 import useSWR from "swr";
 const fetcher = (u:string)=>fetch(u).then(r=>r.json());
-type Booking={id:string,serviceTitle:string,date:string,time:string,status:"PENDING"|"DONE"|"CANCELLED",createdAt:string};
+type Booking={id:string,serviceTitle:string,date:string,time:string,status:"PENDING"|"PAID"|"DONE"|"CANCELLED",createdAt:string};
 export default function AllBookingsPage(){
   const {data} = useSWR<Booking[]>("/api/bookings", fetcher, {refreshInterval:5000});
   return (
