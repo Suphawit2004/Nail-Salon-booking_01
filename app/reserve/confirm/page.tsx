@@ -1,6 +1,6 @@
 "use client";
 import LayoutWrapper from "@/app/components/LayoutWrapper";
-import { SERVICES } from "@/lib/store";
+import { SERVICES } from "@/lib/catalog";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState } from "react";
 export default function ConfirmPage(){

@@ -1,7 +1,7 @@
 "use client";
 import LayoutWrapper from "@/app/components/LayoutWrapper";
 import { useRouter, useSearchParams } from "next/navigation";
-import { SERVICES } from "@/lib/store";
+import { SERVICES } from "@/lib/catalog";
 import { useState } from "react";
 
 export default function DayPage(){

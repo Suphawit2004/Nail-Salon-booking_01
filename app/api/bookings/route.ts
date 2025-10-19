@@ -1,3 +1,4 @@
+import { SERVICES } from "@/lib/catalog";
 
 import { NextResponse } from "next/server";
 import { readBookings, writeBooking, type Booking } from "@/lib/store";
@@ -7,7 +8,7 @@ export async function GET(){ const list=await readBookings(); return NextRespons
 export async function POST(req:Request){
   try{
     const {serviceId,serviceTitle,date,time} = await req.json();
-    if(!serviceId||!serviceTitle||!date||!time) return NextResponse.json({error:"bad-request"},{status:400});
+    if(!serviceId||!date||!time) return NextResponse.json({error:"bad-request"},{status:400});
     if(isPast(date,time)) return NextResponse.json({error:"past-not-allowed"},{status:400});
     const bk:Booking={id:`bk_${Date.now()}`,serviceId,serviceTitle,date,time,status:"PENDING",createdAt:new Date().toISOString()};
     await writeBooking(bk);
