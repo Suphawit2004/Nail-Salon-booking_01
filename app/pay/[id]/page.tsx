@@ -48,12 +48,12 @@ export default function PayInfoPage(){
             <input value={phone} onChange={e=>setPhone(e.target.value)} className="block w-full mt-1 border rounded-lg p-2" placeholder="08xxxxxxxx"/>
           </label>
         </div>
+        {bk?.code && <div className="mt-2 text-xs text-gray-600">รหัสการจอง: <span className="font-semibold">{bk.code}</span></div>}
         <div className="mt-3 text-right font-semibold text-pink-700">ยอดชำระ {amount.toLocaleString()}฿</div>
         <div className="text-center mt-3">
           <button onClick={handleSave} disabled={saving} className="px-5 py-2 rounded-xl bg-pink-500 text-white text-sm">{saving?"กำลังบันทึก…":"ถัดไป: ชำระเงิน"}</button>
         </div>
-        <div className="text-center mt-2"><a className="text-xs text-pink-600 underline" href={`/pay/${id}/checkout`}>ไปหน้าชำระเงิน (สำรอง)</a></div>
-      </div>
+        </div>
     </LayoutWrapper>
   );
 }

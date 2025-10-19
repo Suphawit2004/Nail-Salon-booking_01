@@ -3,6 +3,7 @@ import { readBookings } from "@/lib/store";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
+  const serviceId = searchParams.get("serviceId"); // optional; reserved for future capacity logic
   const date = searchParams.get("date");
   if (!date) return NextResponse.json({ error: "date required" }, { status: 400 });
   const list = await readBookings();

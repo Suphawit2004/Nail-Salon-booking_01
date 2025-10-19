@@ -11,13 +11,19 @@ export async function GET(req: Request){
   const filtered = status ? list.filter(b => b.status === status) : list;
   return NextResponse.json(filtered.sort((a,b)=>b.createdAt.localeCompare(a.createdAt)));
 }
+function genCode(){
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let s = "MN";
+  for(let i=0;i<6;i++){ s += chars[Math.floor(Math.random()*chars.length)]; }
+  return s;
+}
 export async function POST(req:Request){
   try{
-    const { serviceId, date, time } = await req.json();
+    const { serviceId, date, time, name, phone } = await req.json();
     const serviceTitle = SERVICES[serviceId]?.title ?? "";
     if(!serviceId||!date||!time) return NextResponse.json({error:"bad-request"},{status:400});
     if(isPast(date,time)) return NextResponse.json({error:"past-not-allowed"},{status:400});
-    const bk:Booking={id:`bk_${Date.now()}`,serviceId,serviceTitle,date,time,status:"PENDING",createdAt:new Date().toISOString()};
+    const bk:Booking={id:`bk_${Date.now()}`,serviceId,serviceTitle,date,time,status:"PENDING",createdAt:new Date().toISOString(), name, phone, code: genCode() };
     await writeBooking(bk);
     return NextResponse.json(bk);
   }catch{ return NextResponse.json({error:"internal"},{status:500}); }

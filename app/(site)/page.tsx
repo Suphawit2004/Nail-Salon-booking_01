@@ -30,17 +30,7 @@ export default function HomePage(){
       </section>
       <section className="px-4 mt-6 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <article className="card overflow-hidden">
-            <div className="relative h-28 w-full"><Image src="/idea1.jpg" alt="idea1" fill className="object-cover"/></div>
-            <div className="p-4"><h3 className="font-semibold">มัดรวม 50+ ไอเดียเล็บฮาโลวีน</h3>
-              <p className="text-sm text-gray-500 mt-1 line-clamp-3">รวมลายเล็บฮาโลวีนสุดเก๋ เอาใจสายทำเล็บ ฯลฯ</p></div>
-          </article>
-          <article className="card overflow-hidden">
-            <div className="relative h-28 w-full"><Image src="/idea2.jpg" alt="idea2" fill className="object-cover"/></div>
-            <div className="p-4"><h3 className="font-semibold">ไอเดียทาเล็บ คริสต์มาส 2024</h3>
-              <p className="text-sm text-gray-500 mt-1 line-clamp-3">รวมไอเดียลายเล็บธีมคริสต์มาส สุดคิ้วท์ ทำรับเทศกาล</p></div>
-          </article>
-        </div>
+          </div>
       </section>
     </div>
   );

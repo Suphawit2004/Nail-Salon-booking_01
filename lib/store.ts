@@ -13,6 +13,7 @@ export type Booking = {
   phone?: string;
   paymentMethod?: string;
   paidAt?: string;
+  code?: string;
   slipUrl?: string;
 };
 

@@ -23,7 +23,22 @@ export default function ReservePage(){
   const isPast = (d:string,t:string)=> new Date(`${d}T${t}:00${TZ}`).getTime() < Date.now();
   const handleNext = async()=>{
     if(!time){ alert("โปรดเลือกเวลา"); return; }
-    router.push(`/reserve/customer?serviceId=${serviceId}&date=${date}&time=${time}`);
+    try{
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ serviceId, date, time })
+      });
+      if(!res.ok){
+        const e = await res.json().catch(()=>({}));
+        alert(e?.error || "สร้างการจองไม่สำเร็จ");
+        return;
+      }
+      const bk = await res.json();
+      router.push(`/pay/${bk.id}`);
+    }catch(err){
+      alert("เกิดข้อผิดพลาดในการจอง");
+    }
   };
   return (
     <LayoutWrapper>
