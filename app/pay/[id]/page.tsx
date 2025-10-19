@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+const DEPOSIT = 100;
 import LayoutWrapper from "../../components/LayoutWrapper";
 
 type Booking = { id:string; serviceId:string; serviceTitle:string; date:string; time:string; createdAt:string; status:"PENDING"|"CONFIRMED"|"CANCELLED"; customerName?:string; phone?:string; promo?:{title?:string;price?:number;oldPrice?:number}; };
@@ -32,7 +33,7 @@ export default function PayInfoPage(){
   };
 
   if(!bk) return <LayoutWrapper>กำลังโหลด…</LayoutWrapper>;
-  const amount = finalPrice(bk);
+  const amount = DEPOSIT;
 
   return (
     <LayoutWrapper>

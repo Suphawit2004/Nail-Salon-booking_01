@@ -53,3 +53,18 @@ export async function updateBooking(id: string, patch: Partial<Booking>){
   await fs.writeFile(filePath, JSON.stringify(list, null, 2), "utf8");
   return updated;
 }
+
+
+export const HOLD_MIN = 15; // ถือคิวสถานะ PENDING ภายใน 15 นาที
+
+function isPendingActive(b: Booking){
+  if(b.status !== "PENDING") return false;
+  const t = Date.parse(b.createdAt || "");
+  if(isNaN(t)) return true; // ถ้าอ่านเวลาไม่ได้ ป้องกันการชนด้วยการถือว่า active
+  return (Date.now() - t) <= HOLD_MIN * 60 * 1000;
+}
+
+export function isSlotLocked(list: Booking[], date: string, time: string){
+  return list.some(b => b.date===date && b.time===time && (b.status==="PAID" || b.status==="DONE" || isPendingActive(b)));
+}
+

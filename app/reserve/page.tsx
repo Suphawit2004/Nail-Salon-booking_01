@@ -30,8 +30,14 @@ export default function ReservePage(){
         body: JSON.stringify({ serviceId, date, time })
       });
       if(!res.ok){
-        const e = await res.json().catch(()=>({}));
-        alert(e?.error || "สร้างการจองไม่สำเร็จ");
+        if(res.status===409){
+          alert("ช่วงเวลานี้ถูกจองแล้ว กรุณาเลือกเวลาอื่น");
+          // reload slots
+          try{ await fetch(`/api/slots?date=${date}`).then(r=>r.json()).then(d=>{ const next:any={}; (d.taken||[]).forEach((tm:string)=> next[`${d.date} ${tm}`]=true); setTaken(next); }); }catch{}
+        } else {
+          const e = await res.json().catch(()=>({}));
+          alert(e?.error || "สร้างการจองไม่สำเร็จ");
+        }
         return;
       }
       const bk = await res.json();

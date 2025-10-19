@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readBookings } from "@/lib/store";
+import { readBookings, HOLD_MIN } from "@/lib/store";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -7,8 +7,16 @@ export async function GET(req: Request) {
   const date = searchParams.get("date");
   if (!date) return NextResponse.json({ error: "date required" }, { status: 400 });
   const list = await readBookings();
-  const taken = list
-    .filter(b => b.date === date && (b.status === "PAID" || b.status === "DONE"))
-    .map(b => b.time);
+  const takenSet = new Set<string>();
+  const now = Date.now();
+  for(const b of list){
+    if(b.date !== date) continue;
+    if(b.status === "PAID" || b.status === "DONE"){ takenSet.add(b.time); continue; }
+    if(b.status === "PENDING"){
+      const t = Date.parse(b.createdAt || "");
+      if(!isNaN(t) && (now - t) <= HOLD_MIN*60*1000){ takenSet.add(b.time); }
+    }
+  }
+  const taken = Array.from(takenSet);
   return NextResponse.json({ date, taken });
 }

@@ -1,8 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+const DEPOSIT = 100;
+const BANK_INFO = { bank: "กสิกรไทย (KBank)", name: "Min Nail Studio", number: "123-4-56789-0" };
+const PROMPTPAY_INFO = { id: "081-234-5678" }; // ตัวอย่าง พร้อมเพย์ (สมมติ)
+
 import LayoutWrapper from "../../../components/LayoutWrapper";
-import { Landmark, QrCode } from "lucide-react";
+import { Landmark, QrCode, Copy } from "lucide-react";
 
 type B = { id:string; serviceId:string; serviceTitle:string; date:string; time:string; createdAt:string; status:"PENDING"|"CONFIRMED"|"CANCELLED"; customerName?:string; phone?:string; promo?:{title?:string;price?:number;oldPrice?:number}; paymentMethod?:string; paidAt?:string; };
 const basePrice=(sid:string)=> sid==="svc-01"?890: sid==="svc-02"?690:490;
@@ -25,7 +29,57 @@ export default function Checkout(){
   const [loading,setLoading] = useState(false);
   const [fakeRef] = useState(randomRef());
 
-  useEffect(()=>{(async()=>{ const r=await fetch(`/api/bookings/${id}`,{cache:"no-store"}); if(r.ok) setBk(await r.json()); })();},[id]);
+  const copyText = async (t:string)=>{ try{ await navigator.clipboard.writeText(t); alert("คัดลอกแล้ว"); }catch{} };
+
+  const BankPanel = () => (
+    <div className="rounded-2xl border border-pink-100 bg-pink-50/40 p-3">
+      <div className="text-sm">โอนเข้าบัญชีธนาคาร</div>
+      <div className="mt-2 grid grid-cols-[100px_1fr] gap-y-1 text-sm max-sm:grid-cols-1">
+        <div className="text-gray-600">ธนาคาร</div><div className="font-medium">{BANK_INFO.bank}</div>
+        <div className="text-gray-600">ชื่อบัญชี</div><div className="font-medium">{BANK_INFO.name}</div>
+        <div className="text-gray-600">เลขบัญชี</div>
+        <div className="flex items-center gap-2 font-mono">
+          {BANK_INFO.number}
+          <button type="button" onClick={()=>copyText(BANK_INFO.number)} className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 border rounded-md">
+            <Copy className="h-3 w-3"/> คัดลอก
+          </button>
+        </div>
+      </div>
+      <div className="mt-2 text-right text-pink-700 font-semibold">ยอดชำระ {amount.toLocaleString()}฿</div>
+    </div>
+  );
+
+  const PromptPanel = () => (
+    <div className="rounded-2xl border border-pink-100 bg-pink-50/40 p-3">
+      <div className="text-sm mb-2">พร้อมเพย์ (PromptPay)</div>
+      <div className="flex items-start gap-3 max-sm:flex-col">
+        <div className="shrink-0">
+          {/* QR Placeholder (จำลอง) */}
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <rect width="120" height="120" fill="#fff" stroke="#e5e7eb"/>
+            <rect x="10" y="10" width="28" height="28" fill="#111"/>
+            <rect x="82" y="10" width="28" height="28" fill="#111"/>
+            <rect x="10" y="82" width="28" height="28" fill="#111"/>
+            <rect x="50" y="50" width="6" height="6" fill="#111"/>
+            <rect x="62" y="50" width="6" height="6" fill="#111"/>
+            <rect x="50" y="62" width="6" height="6" fill="#111"/>
+            <rect x="62" y="62" width="6" height="6" fill="#111"/>
+            <rect x="74" y="74" width="10" height="10" fill="#111"/>
+          </svg>
+        </div>
+        <div className="flex-1 text-sm">
+          <div>PromptPay ID: <span className="font-mono font-medium">{PROMPTPAY_INFO.id}</span>
+            <button type="button" onClick={()=>copyText(PROMPTPAY_INFO.id)} className="ml-2 inline-flex items-center gap-1 text-[11px] px-2 py-0.5 border rounded-md">
+              <Copy className="h-3 w-3"/> คัดลอก
+            </button>
+          </div>
+          <div className="mt-2 text-pink-700 font-semibold">ยอดชำระ {amount.toLocaleString()}฿</div>
+          <div className="mt-1 text-[11px] text-gray-500">*สแกน/โอนแล้วแนบสลิปด้านล่าง</div>
+        </div>
+      </div>
+    </div>
+  );
+useEffect(()=>{(async()=>{ const r=await fetch(`/api/bookings/${id}`,{cache:"no-store"}); if(r.ok) setBk(await r.json()); })();},[id]);
   
   const onConfirmPay = async () => {
     if(!bk) return;
@@ -48,7 +102,7 @@ export default function Checkout(){
     
 
   if(!bk) return <LayoutWrapper>กำลังโหลด…</LayoutWrapper>;
-  const amount = finalPrice(bk);
+  const amount = DEPOSIT;
 
   return (
     <LayoutWrapper>
@@ -81,6 +135,7 @@ export default function Checkout(){
           <div className="flex items-start gap-2">
             <div className="flex-1">
               <div className="font-medium">ยืนยันการชำระเงิน</div>
+              <div className="mt-3">{method==="BANK" ? <BankPanel/> : <PromptPanel/>}</div>
               <div className="mt-4">
             <p className="text-sm font-medium">แนบสลิปโอนเงิน</p>
             <input type="file" accept="image/*" onChange={(e)=>{ const f=e.target.files?.[0]||null; setSlip(f); setPreview(f?URL.createObjectURL(f):""); }} className="mt-2 block w-full text-sm" />
