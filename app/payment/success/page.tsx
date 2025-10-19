@@ -1,18 +1,20 @@
 "use client";
-import LayoutWrapper from "@/app/components/LayoutWrapper";
+import BackBar from "@/app/components/BackBar";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+
 export default function PaySuccess(){
   const router = useRouter();
   useEffect(()=>{ const t=setTimeout(()=>router.replace("/all-bookings"), 1200); return ()=>clearTimeout(t); },[router]);
   return (
-    <LayoutWrapper>
-      <section className="px-4 mt-14 flex justify-center">
-        <div className="rounded-3xl bg-white border border-pink-100 shadow p-10 text-center">
-          <div className="mx-auto mb-4 h-20 w-20 rounded-full bg-pink-50 flex items-center justify-center ring-1 ring-pink-200"><span className="text-3xl">✔</span></div>
-          <h2 className="font-semibold text-gray-800">ชำระเงินสำเร็จ</h2><p className="text-gray-500 text-sm mt-1">ขอบคุณค่ะ เจอกันวันนัดนะคะ</p>
+    <>
+      <BackBar title="ชำระเงินสำเร็จ" href="/all-bookings" />
+      <section className="px-4 mt-10 text-center">
+        <div className="inline-block rounded-2xl border border-pink-100 bg-white px-8 py-10 shadow-soft">
+          <div className="mx-auto mb-3 h-16 w-16 rounded-full grid place-items-center border border-emerald-200 bg-emerald-50 text-emerald-600">✓</div>
+          <p className="font-semibold">ชำระเงินสำเร็จ</p>
         </div>
       </section>
-    </LayoutWrapper>
+    </>
   );
 }

@@ -55,5 +55,35 @@
       "createdAt": "2025-10-19T13:33:19.603Z"
     },
     "createdAt": "2025-10-19T13:33:19.605Z"
+  },
+  {
+    "id": "lg_1760881357411",
+    "type": "BOOKING_CREATE",
+    "bookingId": "bk_1760881357407",
+    "payload": {
+      "id": "bk_1760881357407",
+      "serviceId": "svc-01",
+      "serviceTitle": "ถอดpvc และต่อเล็บ",
+      "date": "2025-11-05",
+      "time": "13:00",
+      "status": "PENDING",
+      "createdAt": "2025-10-19T13:42:37.407Z"
+    },
+    "createdAt": "2025-10-19T13:42:37.411Z"
+  },
+  {
+    "id": "lg_1760882806215",
+    "type": "BOOKING_CREATE",
+    "bookingId": "bk_1760882806210",
+    "payload": {
+      "id": "bk_1760882806210",
+      "serviceId": "svc-01",
+      "serviceTitle": "ถอดpvc และต่อเล็บ",
+      "date": "2025-10-27",
+      "time": "15:00",
+      "status": "PENDING",
+      "createdAt": "2025-10-19T14:06:46.210Z"
+    },
+    "createdAt": "2025-10-19T14:06:46.215Z"
   }
 ]
