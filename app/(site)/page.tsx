@@ -61,7 +61,7 @@ export default function HomePage(){
         {PHONE ? (
           <a href={`tel:${PHONE.replace(/\D/g,"")}`} className="font-medium">{PHONE}</a>
         ) : (
-          <span className="text-gray-500">เพิ่มเบอร์โทรได้ในไฟล์หน้าแรก (ตัวแปร PHONE)</span>
+          <span className="text-gray-500">+95 81 90 899</span>
         )}
       </div>
     </div>
