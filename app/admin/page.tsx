@@ -22,8 +22,7 @@ export default function AdminPage(){
           {list.map(b=>(
             <article key={b.id} className="rounded-2xl border border-pink-100 bg-white p-4 shadow-sm">
               <div className="flex justify-between items-center"><div><h3 className="font-semibold text-gray-800">{b.serviceTitle}</h3><p className="text-xs text-gray-600 mt-1">วันที่ {b.date} • เวลา {b.time}</p></div>
-              <div className="flex gap-2">{tab==="PENDING"&&<button onClick={()=>markPaid(b.id)} className="px-3 py-1.5 rounded-lg bg-pink-600 text-white text-xs">รับชำระ</button>}{tab==="PENDING"&&<button onClick={()=>markDone(b.id)} className="px-3 py-1.5 rounded-lg bg-pink-500 text-white text-xs">ให้บริการเสร็จสิ้น</button>}{tab==="PENDING"&&<button onClick={()=>markPaid(b.id)} className="px-3 py-1.5 rounded-lg bg-pink-600 text-white text-xs">รับชำระ</button>}{tab==="PENDING"&&<button onClick={()=>cancel(b.id)} className="px-3 py-1.5 rounded-lg border text-xs">ยกเลิก</button>}</div></div>
-            </article>
+              <div className="flex gap-2">{tab==="PENDING"&&<button onClick={()=>markPaid(b.id)} className="px-3 py-1.5 rounded-lg bg-pink-600 text-white text-xs">รับชำระ</button>}{tab!=="CANCELLED"&&<button onClick={()=>markDone(b.id)} className="px-3 py-1.5 rounded-lg bg-pink-500 text-white text-xs">ให้บริการเสร็จสิ้น</button>}{tab!=="DONE"&&<button onClick={()=>cancel(b.id)} className="px-3 py-1.5 rounded-lg border text-xs">ยกเลิก</button>}</div></div></article>
           ))}
         </div>
       </section>

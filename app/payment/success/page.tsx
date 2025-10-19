@@ -1,5 +1,10 @@
 import LayoutWrapper from "@/app/components/LayoutWrapper";
+"use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 export default function PaySuccess(){
+  const router = useRouter();
+  useEffect(()=>{ const t=setTimeout(()=>router.replace("/all-bookings"), 1200); return ()=>clearTimeout(t); },[router]);
   return (
     <LayoutWrapper>
       <section className="px-4 mt-14 flex justify-center">

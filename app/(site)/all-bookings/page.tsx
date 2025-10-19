@@ -1,24 +1,57 @@
-
 "use client";
 import useSWR from "swr";
-const fetcher = (u:string)=>fetch(u).then(r=>r.json());
+import LayoutWrapper from "@/app/components/LayoutWrapper";
+import { useState, useMemo } from "react";
+
 type Booking={id:string,serviceTitle:string,date:string,time:string,status:"PENDING"|"PAID"|"DONE"|"CANCELLED",createdAt:string};
+
+const fetcher = (u:string)=>fetch(u).then(r=>r.json());
+
 export default function AllBookingsPage(){
-  const {data} = useSWR<Booking[]>("/api/bookings", fetcher, {refreshInterval:5000});
+  const {data, mutate} = useSWR<Booking[]>("/api/bookings", fetcher, {refreshInterval:5000});
+  const [tab,setTab] = useState<"WAITING"|"DONE"|"CANCELLED">("WAITING");
+  const list = useMemo(()=>{
+    const src = (data ?? []).slice().sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
+    if(tab==="WAITING") return src.filter(b=>b.status==="PENDING"||b.status==="PAID");
+    if(tab==="DONE")    return src.filter(b=>b.status==="DONE");
+    return src.filter(b=>b.status==="CANCELLED");
+  },[data,tab]);
+
+  const cancel = async(id:string)=>{
+    if(!confirm("ยกเลิกรายการนี้?")) return;
+    await fetch(`/api/bookings/${id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({status:"CANCELLED"})});
+    mutate();
+  };
+
   return (
-    <section className="px-4 mt-6 pb-24">
-      <h2 className="text-pink-600 font-semibold mb-3">จองทั้งหมด (อัปเดตอัตโนมัติ)</h2>
-      <div className="space-y-3">
-        {(data??[]).map(b=>(
-          <article key={b.id} className="card p-4">
-            <div className="flex items-center justify-between">
-              <div><p className="font-semibold">{b.serviceTitle}</p><p className="text-sm text-gray-600">{b.date} • {b.time}</p></div>
-              <span className="text-xs rounded-full px-2.5 py-1 bg-pink-100 text-pink-700">{b.status}</span>
-            </div>
-          </article>
-        ))}
-        {!data?.length && <p className="text-sm text-gray-500">--- ไม่พบรายการ ---</p>}
-      </div>
-    </section>
+    <LayoutWrapper>
+      <section className="px-4 mt-6 pb-24">
+        <div className="mx-auto max-w-md mb-4 rounded-full bg-pink-50 border border-pink-100 grid grid-cols-3 overflow-hidden">
+          {[
+            {k:"WAITING", t:"รอเข้ารับบริการ"},
+            {k:"DONE",    t:"เข้ารับบริการแล้ว"},
+            {k:"CANCELLED", t:"ยกเลิก"},
+          ].map((o:any)=>(
+            <button key={o.k} onClick={()=>setTab(o.k)} className={`py-2 text-xs ${tab===o.k?'bg-pink-200/70 font-semibold':''}`}>{o.t}</button>
+          ))}
+        </div>
+        <div className="space-y-3">
+          {list.map(b=>(
+            <article key={b.id} className="rounded-2xl border border-pink-100 bg-white p-4 shadow-soft">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="font-semibold">{b.serviceTitle}</p>
+                  <p className="text-xs text-gray-600 mt-1">วันที่ {b.date} • เวลา {b.time}</p>
+                </div>
+                <div className="flex gap-2">
+                  {(b.status==="PENDING"||b.status==="PAID") && <button onClick={()=>cancel(b.id)} className="px-3 py-1.5 rounded-lg border text-xs">ยกเลิก</button>}
+                </div>
+              </div>
+            </article>
+          ))}
+          {list.length===0 && <div className="text-center text-sm text-gray-500 py-20">--- ไม่พบรายการ ---</div>}
+        </div>
+      </section>
+    </LayoutWrapper>
   )
 }
