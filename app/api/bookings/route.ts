@@ -4,7 +4,13 @@ import { NextResponse } from "next/server";
 import { readBookings, writeBooking, type Booking } from "@/lib/store";
 const TZ = "+07:00";
 const isPast = (date:string,time:string)=> new Date(`${date}T${time}:00${TZ}`).getTime() < Date.now();
-export async function GET(){ const list=await readBookings(); return NextResponse.json(list.sort((a,b)=>b.createdAt.localeCompare(a.createdAt))); }
+export async function GET(req: Request){
+  const url = new URL(req.url);
+  const status = url.searchParams.get("status");
+  const list = await readBookings();
+  const filtered = status ? list.filter(b => b.status === status) : list;
+  return NextResponse.json(filtered.sort((a,b)=>b.createdAt.localeCompare(a.createdAt)));
+}
 export async function POST(req:Request){
   try{
     const { serviceId, date, time } = await req.json();

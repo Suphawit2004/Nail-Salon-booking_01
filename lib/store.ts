@@ -13,6 +13,7 @@ export type Booking = {
   phone?: string;
   paymentMethod?: string;
   paidAt?: string;
+  slipUrl?: string;
 };
 
 const filePath = path.join(process.cwd(), "var", "bookings.json");

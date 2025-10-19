@@ -2,20 +2,17 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import LayoutWrapper from "../../../components/LayoutWrapper";
-import { CreditCard, Wallet, Landmark, QrCode, CircleDollarSign, ShieldCheck } from "lucide-react";
+import { Landmark, QrCode } from "lucide-react";
 
 type B = { id:string; serviceId:string; serviceTitle:string; date:string; time:string; createdAt:string; status:"PENDING"|"CONFIRMED"|"CANCELLED"; customerName?:string; phone?:string; promo?:{title?:string;price?:number;oldPrice?:number}; paymentMethod?:string; paidAt?:string; };
 const basePrice=(sid:string)=> sid==="svc-01"?890: sid==="svc-02"?690:490;
 const finalPrice=(b:B)=> b.promo?.price ?? basePrice(b.serviceId);
 function randomRef(){ const n=Math.floor(100000+Math.random()*900000); return `MIN${n}`; }
 
-type PayMethod="PROMPTPAY"|"BANK"|"CARD"|"WALLET"|"CASH";
+type PayMethod = "PROMPTPAY"|"BANK";
 const METHODS = [
   { key:"PROMPTPAY", title:"PromptPay / พร้อมเพย์", desc:"โอนผ่านพร้อมเพย์", icon: QrCode },
   { key:"BANK", title:"โอนผ่านธนาคาร", desc:"โอนบัญชีธนาคาร", icon: Landmark },
-  { key:"CARD", title:"บัตรเครดิต/เดบิต", desc:"ชำระด้วยบัตร", icon: CreditCard },
-  { key:"WALLET", title:"วอลเล็ต", desc:"TrueMoney / อื่นๆ", icon: Wallet },
-  { key:"CASH", title:"ชำระเงินสดที่ร้าน", desc:"จ่ายหน้างาน", icon: CircleDollarSign },
 ] as const;
 
 export default function Checkout(){
@@ -23,21 +20,32 @@ export default function Checkout(){
   const router = useRouter();
   const [bk,setBk] = useState<B|null>(null);
   const [method,setMethod] = useState<PayMethod>("PROMPTPAY");
-  const [agree,setAgree] = useState(false);
+  const [slip, setSlip] = useState<File|null>(null);
+  const [preview, setPreview] = useState<string>("");
   const [loading,setLoading] = useState(false);
   const [fakeRef] = useState(randomRef());
 
   useEffect(()=>{(async()=>{ const r=await fetch(`/api/bookings/${id}`,{cache:"no-store"}); if(r.ok) setBk(await r.json()); })();},[id]);
-  const onConfirmPay = async ()=>{
+  
+  const onConfirmPay = async () => {
     if(!bk) return;
-    if(!agree) return alert("กรุณาติ๊กยืนยันการชำระเงินก่อน");
+    if(!slip) return alert("โปรดแนบสลิปการโอนเงิน");
     setLoading(true);
-    const r = await fetch(`/api/bookings/${id}`,{ method:"PATCH", headers:{ "Content-Type":"application/json"}, body: JSON.stringify({ status:"CONFIRMED", paymentMethod: method, paidAt: new Date().toISOString() })});
-    setLoading(false);
-    if(!r.ok){ alert("ชำระเงินไม่สำเร็จ"); return; }
-    alert(`ชำระเงินสำเร็จ! รหัสยืนยัน: ${fakeRef}`);
-    router.push("/all-bookings");
+    try{
+      const fd = new FormData();
+      fd.append("paymentMethod", method);
+      fd.append("slip", slip);
+      const r = await fetch(`/api/bookings/${id}`, { method:"PATCH", body: fd });
+      setLoading(false);
+      if(!r.ok){ alert("ชำระเงินไม่สำเร็จ"); return; }
+      alert("ส่งสลิปเรียบร้อย กำลังพาไปหน้ารายการทั้งหมด");
+      router.push("/all-bookings");
+    }catch(e){
+      setLoading(false);
+      alert("เกิดข้อผิดพลาดในการอัพโหลดสลิป");
+    }
   };
+    
 
   if(!bk) return <LayoutWrapper>กำลังโหลด…</LayoutWrapper>;
   const amount = finalPrice(bk);
@@ -71,20 +79,22 @@ export default function Checkout(){
 
         <div className="mt-3 rounded-xl bg-white border border-pink-100 p-3 text-sm">
           <div className="flex items-start gap-2">
-            <ShieldCheck className="h-4 w-4 text-pink-600 mt-0.5"/>
             <div className="flex-1">
               <div className="font-medium">ยืนยันการชำระเงิน</div>
-              <p className="text-gray-600 text-[13px]">ติ๊กยืนยันเพื่อจบการทำรายการ (ไม่ต้องแนบสลิป/เลขอ้างอิง)</p>
-              <label className="mt-2 flex items-center gap-2 text-[13px]">
-                <input type="checkbox" checked={agree} onChange={e=>setAgree(e.target.checked)}/> ข้าพเจ้ายืนยันว่าได้ชำระเงินเรียบร้อยแล้ว
-              </label>
+              <div className="mt-4">
+            <p className="text-sm font-medium">แนบสลิปโอนเงิน</p>
+            <input type="file" accept="image/*" onChange={(e)=>{ const f=e.target.files?.[0]||null; setSlip(f); setPreview(f?URL.createObjectURL(f):""); }} className="mt-2 block w-full text-sm" />
+            {preview && <img src={preview} alt="สลิป" className="mt-2 max-h-60 rounded-lg border" />}
+          </div>
+
+          
             </div>
           </div>
         </div>
 
         <div className="flex justify-center gap-2 pt-2">
           <button onClick={()=>history.back()} className="px-5 py-2 rounded-xl border border-gray-200 text-sm hover:bg-gray-50">ย้อนกลับ</button>
-          <button onClick={onConfirmPay} disabled={loading||!agree} className="px-6 py-2 rounded-xl bg-pink-500 text-white text-sm font-semibold hover:bg-pink-600 disabled:opacity-60">{loading?"กำลังดำเนินการ...":"ยืนยันชำระเงิน"}</button>
+          <button onClick={onConfirmPay} disabled={loading || !slip} className="px-6 py-2 rounded-xl bg-pink-500 text-white text-sm font-semibold hover:bg-pink-600 disabled:opacity-60">{loading?"กำลังดำเนินการ...":"ยืนยันชำระเงิน"}</button>
         </div>
       </div>
     </LayoutWrapper>
