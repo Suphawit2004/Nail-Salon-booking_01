@@ -1,6 +1,5 @@
 "use client";
 import useSWR from "swr";
-import LayoutWrapper from "@/app/components/LayoutWrapper";
 import { useState, useMemo } from "react";
 
 type Booking={id:string,serviceTitle:string,date:string,time:string,status:"PENDING"|"PAID"|"DONE"|"CANCELLED",createdAt:string};
@@ -24,17 +23,9 @@ export default function AllBookingsPage(){
   };
 
   return (
-    <LayoutWrapper>
+    
       <section className="px-4 mt-6 pb-24">
-        <div className="mx-auto max-w-md mb-4 rounded-full bg-pink-50 border border-pink-100 grid grid-cols-3 overflow-hidden">
-          {[
-            {k:"WAITING", t:"รอเข้ารับบริการ"},
-            {k:"DONE",    t:"เข้ารับบริการแล้ว"},
-            {k:"CANCELLED", t:"ยกเลิก"},
-          ].map((o:any)=>(
-            <button key={o.k} onClick={()=>setTab(o.k)} className={`py-2 text-xs ${tab===o.k?'bg-pink-200/70 font-semibold':''}`}>{o.t}</button>
-          ))}
-        </div>
+        <div className="mx-auto max-w-md mb-4 rounded-full bg-pink-50 border border-pink-100 grid grid-cols-4 overflow-hidden">{[{k:"ALL",t:"รายการทั้งหมด"},{k:"WAITING",t:"รอรับบริการ"},{k:"DONE",t:"เข้ารับบริการแล้ว"},{k:"CANCELLED",t:"ยกเลิก"}].map((o:any)=>(<button key={o.k} onClick={()=>setTab(o.k)} className={`py-2 text-xs ${tab===o.k?'bg-pink-200/70 font-semibold':''}`}>{o.t}</button>))}</div>
         <div className="space-y-3">
           {list.map(b=>(
             <article key={b.id} className="rounded-2xl border border-pink-100 bg-white p-4 shadow-soft">
@@ -52,6 +43,6 @@ export default function AllBookingsPage(){
           {list.length===0 && <div className="text-center text-sm text-gray-500 py-20">--- ไม่พบรายการ ---</div>}
         </div>
       </section>
-    </LayoutWrapper>
+    
   )
 }
