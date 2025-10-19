@@ -1,35 +1,57 @@
-import { promises as fs } from "fs";
-import path from "path";
+export type BookingStatus = "PENDING" | "PAID" | "DONE" | "CANCELLED";
 
 export type Booking = {
   id: string;
   serviceId: string;
   serviceTitle: string;
-  date: string;
-  time: string;
-  customerName?: string;
+  date: string;   // YYYY-MM-DD
+  time: string;   // HH:mm (30 นาที)
+  name?: string;
   phone?: string;
-  status: "PENDING" | "PAID" | "DONE" | "CANCELLED";
-  createdAt: string;
+  status: BookingStatus;
+  createdAt: string; // ISO
+  price?: number;
 };
 
-const file = path.join(process.cwd(), ".data", "bookings.json");
+const bookings: Booking[] = [];
 
-async function ensure() {
-  try { await fs.stat(file); }
-  catch {
-    await fs.mkdir(path.dirname(file), { recursive: true });
-    await fs.writeFile(file, "[]", "utf-8");
-  }
+export const SERVICES: Record<string, { title: string; detail: string; price: number }> = {
+  "svc-01": { title: "ถอดPVC และต่อเล็บ", detail: "ถอด pvc ต่อเล็บ ทาสีเจล สีสุภาพ เน้นฟิลลิ่ง", price: 800 },
+  "svc-02": { title: "ถอดPVC ทาสีเจล",   detail: "ถอด pvc, ไฟล์เล็บ, ทาสีเจล",               price: 600 },
+  "svc-03": { title: "ทาสีเจล",           detail: "ทาสีเจล สีสุภาพ / สีพื้น",                   price: 500 },
+};
+
+export function readBookings(filter?: Partial<Pick<Booking, "serviceId" | "date" | "status">>) {
+  if (!filter) return bookings.slice();
+  return bookings.filter(b =>
+    (filter.serviceId ? b.serviceId === filter.serviceId : true) &&
+    (filter.date ? b.date === filter.date : true) &&
+    (filter.status ? b.status === filter.status : true)
+  );
 }
 
-export async function readBookings(): Promise<Booking[]> {
-  await ensure();
-  const raw = await fs.readFile(file, "utf-8");
-  try { return JSON.parse(raw) as Booking[]; } catch { return []; }
+export function writeBooking(b: Booking) {
+  bookings.push(b);
+  return b;
 }
 
-export async function writeBookings(d: Booking[]) {
-  await ensure();
-  await fs.writeFile(file, JSON.stringify(d, null, 2), "utf-8");
+export function updateBooking(id: string, patch: Partial<Booking>) {
+  const idx = bookings.findIndex(b => b.id === id);
+  if (idx === -1) return null;
+  bookings[idx] = { ...bookings[idx], ...patch };
+  return bookings[idx];
+}
+
+export function findBooking(id: string) {
+  return bookings.find(b => b.id === id) || null;
+}
+
+/** กันการจองชนกัน: ถ้ามี PENDING/PAID/DONE ในเวลานั้นแล้ว ห้ามซ้ำ */
+export function isSlotTaken(serviceId: string, date: string, time: string) {
+  return bookings.some(b =>
+    b.serviceId === serviceId &&
+    b.date === date &&
+    b.time === time &&
+    b.status !== "CANCELLED"
+  );
 }

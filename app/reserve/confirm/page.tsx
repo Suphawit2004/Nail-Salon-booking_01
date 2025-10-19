@@ -1,1 +1,28 @@
-"use client";import {useSearchParams,useRouter} from "next/navigation";import {CalendarDays,Clock,User2,Tag} from "lucide-react";import LayoutWrapper from "../../components/LayoutWrapper";const TZ_OFFSET="+07:00";function isPast(date:string,time:string){if(!date||!time)return true;const when=new Date(`${date}T${time}:00${TZ_OFFSET}`);return when.getTime()<Date.now();}export default function ConfirmPage(){const q=useSearchParams();const router=useRouter();const serviceId=q.get("serviceId")??"";const date=q.get("date")??"";const time=q.get("time")??"";const title=serviceId==="svc-01"?"ถอดPVC และต่อเล็บ":serviceId==="svc-02"?"ถอดPVC ทาสีเจล":"ทาสีเจล";const promoTitle=q.get("promoTitle")??"";const promoPrice=q.get("promoPrice")??"";const promoOld=q.get("promoOld")??"";const submit=async()=>{if(!serviceId||!date||!time)return alert("กรุณาเลือกบริการ/วัน/เวลาให้ครบ");if(isPast(date,time)){alert("ไม่สามารถจองย้อนหลังได้ กรุณาเลือกเวลาใหม่");router.push(`/reserve?serviceId=${serviceId}`);return;}const res=await fetch("/api/bookings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({serviceId,serviceTitle:title,date,time,promo:promoTitle?{title:promoTitle,price:promoPrice?Number(promoPrice):undefined,oldPrice:promoOld?Number(promoOld):undefined}:undefined,})});const ct=res.headers.get("content-type")||"";const payload=ct.includes("application/json")?await res.json():{error:await res.text()};if(!res.ok){alert(`สร้างการจองไม่สำเร็จ (${res.status}) : ${(payload as any)?.error||"unknown"}`);return;}router.push(`/pay/${payload.id}`);};return(<LayoutWrapper><h2 className="text-sm font-semibold text-pink-600 mb-3 mt-4">ยืนยันการจอง</h2><div className="rounded-3xl border border-pink-100 shadow-[0_6px_14px_rgba(255,182,193,0.25)] bg-pink-50/60 p-4"><div className="flex gap-3"><div className="relative w-[96px] h-[96px] rounded-2xl bg-white ring-1 ring-pink-100"/><div className="flex-1"><h3 className="font-semibold text-gray-800 text-lg">{title}</h3>{!!promoTitle&&(<div className="mt-2 text-[13px] text-rose-700 flex items-center gap-2"><Tag className="h-4 w-4"/> โปร: <b>{promoTitle}</b>{promoPrice&&(<span className="ml-1"> — <span className="font-semibold">฿{Number(promoPrice).toLocaleString()}</span>{promoOld&&<span className="text-gray-400 line-through ml-2 text-xs">฿{Number(promoOld).toLocaleString()}</span>}</span>)}</div>)}<div className="mt-3 space-y-2 text-sm text-gray-700"><div className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-pink-500"/><span>{date||"xx/xx/xxxx"}</span></div><div className="flex items-center gap-2"><Clock className="h-4 w-4 text-pink-500"/><span>{time||"00:00"}</span></div><div className="flex items-center gap-2"><User2 className="h-4 w-4 text-pink-500"/><span>1 ท่าน</span></div></div></div></div><div className="mt-4 flex justify-center"><button onClick={submit} className="px-6 py-2 rounded-xl text-sm font-semibold bg-pink-400 text-white hover:bg-pink-500 shadow-sm">ยืนยันจอง</button></div></div></LayoutWrapper>);}
+"use client";
+import LayoutWrapper from "@/app/components/LayoutWrapper";
+import { SERVICES } from "@/lib/store";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useState } from "react";
+export default function ConfirmPage(){
+  const q=useSearchParams(); const router=useRouter();
+  const serviceId=q.get("serviceId")??""; const date=q.get("date")??""; const time=q.get("time")??"";
+  const s = SERVICES[serviceId]; const [loading,setLoading]=useState(false);
+  const create=async()=>{
+    setLoading(true);
+    const res=await fetch("/api/bookings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({serviceId,date,time})});
+    if(!res.ok){const e=await res.json().catch(()=>({})); alert(`สร้างการจองไม่สำเร็จ (${res.status}) : ${e?.message??"error"}`); setLoading(false); return;}
+    const bk=await res.json(); router.push(`/payment/${bk.id}`);
+  };
+  return (
+    <LayoutWrapper>
+      <section className="px-4 mt-4">
+        <h2 className="text-sm font-semibold text-pink-600 mb-3">ยืนยันการจอง</h2>
+        <div className="rounded-2xl border border-pink-100 bg-pink-50/60 shadow p-4">
+          <h3 className="font-semibold text-gray-800">{s.title}</h3>
+          <div className="mt-3 text-sm text-gray-700 space-y-1"><p>วันที่: <span className="font-medium">{date}</span></p><p>เวลา: <span className="font-medium">{time}</span></p></div>
+          <div className="mt-5 flex justify-center"><button onClick={create} disabled={loading} className="px-6 py-2 rounded-xl bg-pink-400 text-white text-sm disabled:opacity-50">{loading?"กำลังสร้าง...":"ยืนยันจอง"}</button></div>
+        </div>
+      </section>
+    </LayoutWrapper>
+  );
+}

@@ -1,1 +1,0 @@
-This is the admin patch. Replace the placeholders with the code from the chat.

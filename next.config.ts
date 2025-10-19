@@ -1,1 +1,1 @@
-export default { experimental: { typedRoutes: true } } as any;
+import type { NextConfig } from 'next'; const nextConfig: NextConfig = { reactStrictMode:true }; export default nextConfig;

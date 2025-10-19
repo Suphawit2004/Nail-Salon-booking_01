@@ -1,6 +1,22 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-:root{color-scheme:light}
+
 html,body{height:100%}
-.body-soft{background:radial-gradient(circle at 1px 1px, rgba(0,0,0,.03) 1px, transparent 1px) 0 0/12px 12px;}
+body{@apply bg-[#fff7fb] text-gray-800}
+.app-banner{background:linear-gradient(180deg,#ffd3e2 0%,#ffe9f1 55%,#fff7fb 100%)}
+.card{@apply rounded-3xl border border-pink-100 bg-white shadow-soft}
+.bottom-blur{backdrop-filter:saturate(180%) blur(6px)}
+.page-pad-bottom{padding-bottom:6rem}
+
+
+@layer utilities{
+  .shadow-soft{
+    --tw-shadow: 0 8px 24px rgba(244,63,94,.15);
+    --tw-shadow-colored: 0 8px 24px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
+                var(--tw-ring-shadow, 0 0 #0000),
+                var(--tw-shadow);
+  }
+}
