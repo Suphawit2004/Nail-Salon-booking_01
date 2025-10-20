@@ -52,7 +52,7 @@ export default function PayInfoPage(){
         {bk?.code && <div className="mt-2 text-xs text-gray-600">รหัสการจอง: <span className="font-semibold">{bk.code}</span></div>}
         <div className="mt-3 text-right font-semibold text-pink-700">ยอดชำระ {amount.toLocaleString()}฿</div>
         <div className="text-center mt-3">
-          <button onClick={handleSave} disabled={saving} className="px-5 py-2 rounded-xl bg-pink-500 text-white text-sm">{saving?"กำลังบันทึก…":"ถัดไป: ชำระเงิน"}</button>
+          <button onClick={handleSave} disabled={saving} className="px-5 py-2 rounded-xl bg-pink-500 text-white text-sm">{saving?"กำลังบันทึก…":"ถัดไป"}</button>
         </div>
         </div>
     </LayoutWrapper>
